@@ -1,43 +1,72 @@
-# your code goes here
-# import the data
-import urllib2  
-url = 'http://spark-public.s3.amazonaws.com/algo1/programming_prob/IntegerArray.txt'
-file = urllib2.urlopen(url)
-data = []
-for line in file:
-    data.append(int(line))
+# data format
+# weight, length
 
-# Tiral data
-# data = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+import Queue
 
-# build the function
-class Solution():
-    def inverCount(self, data):
-    	if len(data) <= 1:
-    		return [data, 0]
-    	if len(data) == 2:
-    		if data[0] > data[1]:
-    			return [data[::-1], 1]
-    		return [data, 0]
-    	[data1, count1] = self.inverCount(data[ : len(data)/2])
-    	[data2, count2] = self.inverCount(data[len(data)/2 : ])
-    	idx1, idx2 = 0, 0
-    	newData = []
-    	count = 0
-    	while idx1 < len(data1) and idx2 < len(data2):
-    		if data1[idx1] < data2[idx2]:
-    			newData += [data1[idx1]]
-    			idx1 += 1
-    		else:
-    			newData += [data2[idx2]]
-    			idx2 += 1
-    			count += len(data1) - idx1
-    	if idx1 == len(data1):
-    		newData += data2[idx2:]
-    	else:
-    		newData += data1[idx1:]
-        return [newData, count1 + count2 + count]
+class Solution1():
+    
+    def readData(self):
+        # import the data
+        file = open('jobs.txt', 'r')
+        lines = file.readlines()
+        cnt = int(lines[0])
+        data = []
+        for line in lines[1:]:
+            newop = line.split(' ')
+            data.append(map(int, newop))
+        return data
+    
+    def one(self, data):
+        data = sorted(data, key = lambda x: (x[0] - x[1], x[0]), reverse = True)
+        print data[:10]
+        curr_time = 0
+        output = 0
+        for row in data:
+            curr_time += row[1]
+            output += curr_time * row[0]
+        return output
+    
+    def two(self, data):
+        data = sorted(data, key = lambda x: x[0]/float(x[1]), reverse = True)
+        print data[:10]
+        curr_time = 0
+        output = 0
+        for row in data:
+            curr_time += row[1]
+            output += curr_time * row[0]
+        return output
 
-sol = Solution()
-[data, b] = sol.inverCount(data)
-print b
+class Solution2():
+    
+    def readData(self):
+        # import the data
+        file = open('edges.txt', 'r')
+        lines = file.readlines()
+        self.cnt = map(int, lines[0].split(' '))
+        data = {}
+        for line in lines[1:]:
+            newline = (map(int, line.split(' ')))
+            data[frozenset(newline[0:2])] = newline[2]
+        return data
+    
+    def three(self, data):
+        visited = set([1])
+        output = 0
+        while len(visited) < self.cnt[0]:
+            neighbor = {key: value for (key, value) in data.items() if len(key - visited) == 1}
+            visited = visited | min(neighbor, key = neighbor.get)
+            output += min(neighbor.values())
+            print len(visited), output
+        return output
+
+if __name__ == '__main__':
+    sol1 = Solution1()
+    data = sol1.readData()
+    output1 = sol1.one(data)
+    print output1
+    output2 = sol1.two(data)
+    print output2
+    
+    # sol2 = Solution2()
+    # data2 = sol2.readData()
+    # sol2.three(data2)
